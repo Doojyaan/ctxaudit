@@ -32,14 +32,15 @@ jobs:
       - name: Smoke test on the bundled example
         shell: bash
         run: |
-          node dist/cli.js examples/bloated-agent --json > /tmp/report.json
+          node dist/cli.js examples/bloated-agent --json > report.json
           node -e "
-            const r = require('/tmp/report.json');
+            const r = require('./report.json');
             if (r.preflightTokens <= 0) throw new Error('expected a non-zero pre-flight cost');
             if (r.collisions.length !== 2) throw new Error('expected 2 skill collisions, got ' + r.collisions.length);
             if (r.mcpServers.length !== 3) throw new Error('expected 3 MCP servers');
             console.log('smoke ok:', r.preflightTokens, 'tokens');
           "
+          rm -f report.json
 
       - name: Budget gate must fail when over budget
         shell: bash
