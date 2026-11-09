@@ -163,6 +163,42 @@ Full type definitions ship with the package (`dist/index.d.ts`).
 
 ---
 
+## Architecture
+
+```
+src/
+├── cli.ts        CLI entry point, argument parsing, exit codes
+├── index.ts      public API surface (everything the CLI does, programmatically)
+├── audit.ts      orchestration: discovery → costing → recommendations
+├── discover.ts   filesystem probes across six agent ecosystems
+├── tokens.ts     tokenizer profiles (o200k / cl100k / offline heuristic)
+├── skills.ts     SKILL.md frontmatter parsing + collision detection
+├── mcp.ts        MCP config parsing + per-server schema cost estimation
+├── windows.ts    context window presets
+└── report.ts     terminal rendering
+```
+
+The data flow is a single pass with no hidden state:
+
+```
+discover(root)                    → list of files + what was missing
+  ├─ instructions  → countTokens → LineItem (recurring)
+  ├─ skills        → analyzeSkill → metadata tokens (recurring)
+  │                              → body tokens (on-demand, excluded)
+  │                 findCollisions → Collision[]
+  └─ mcp configs   → estimateMcpCost → McpServerCost[] (tagged by confidence)
+                                    ↓
+                            AuditReport  → renderReport (terminal)
+                                         → JSON (--json)
+                                         → exit code (--budget)
+```
+
+Three design decisions worth naming:
+
+1. **Metadata and body are costed separately.** A skill's description is injected on every request; its body loads only when used. Summing them would report a number the user never pays.
+2. **Every MCP cost carries a confidence tag.** `measured` means a published figure; `estimated` means we assumed 4k tokens. The tag is printed, so the report never hides its own uncertainty.
+3. **A missing config file is a result, not an error.** `--verbose` lists what was probed and not found, so "no AGENTS.md" is distinguishable from "we did not look".
+
 ## Development
 
 ```bash
