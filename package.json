@@ -1,0 +1,53 @@
+{
+  "name": "ctxaudit",
+  "version": "0.1.0",
+  "description": "Find out how much of your agent's context window is burned before you type a single word.",
+  "type": "module",
+  "bin": {
+    "ctxaudit": "./dist/cli.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --test test/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "agent",
+    "context-window",
+    "token",
+    "claude-code",
+    "codex",
+    "opencode",
+    "agents-md",
+    "agent-skills",
+    "mcp",
+    "ai"
+  ],
+  "author": "Doojyaan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Doojyaan/ctxaudit.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "js-tiktoken": "^1.0.21",
+    "picocolors": "^1.1.1",
+    "yaml": "^2.6.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
